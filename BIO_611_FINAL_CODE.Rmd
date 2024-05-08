@@ -1,0 +1,963 @@
+---
+title: "BIo611"
+author: "Luke.R.Lotsis"
+date: "2024-05-06"
+output: html_document
+---
+Lets load in the essential libraries
+```{r setup, echo = TRUE, resutls = "hide", error = FALSE, message = FALSE, warning=FALSE}
+library(tidyverse)
+library(stats)
+library(lawstat)
+library(lme4)
+library(Matrix)
+library(car)
+library(broom)
+library(dplyr)
+library(DHARMa)
+library(emmeans)
+
+```
+
+Time to read in all of the EMG data from Subject 1!
+```{r read in data, subject 0}
+S000_EMG_Flat1 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S000_EMG/Noraxon_CSV_2/IFM_SSUS_S000_Flat1.csv")
+S000_EMG_Flat2 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S000_EMG/Noraxon_CSV_2/IFM_SSUS_S000_Flat2.csv")
+S000_EMG_Flat3 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S000_EMG/Noraxon_CSV_2/IFM_SSUS_S000_Flat3.csv")
+S000_EMG_Flat4 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S000_EMG/Noraxon_CSV_2/IFM_SSUS_S000_Flat4.csv")
+
+S000_EMG_US1 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S000_EMG/Noraxon_CSV_2/IFM_SSUS_S000_US1.csv")
+S000_EMG_US2 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S000_EMG/Noraxon_CSV_2/IFM_SSUS_S000_US2.csv")
+S000_EMG_US3 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S000_EMG/Noraxon_CSV_2/IFM_SSUS_S000_US3.csv")
+S000_EMG_US4 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S000_EMG/Noraxon_CSV_2/IFM_SSUS_S000_US4.csv")
+S000_EMG_US5 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S000_EMG/Noraxon_CSV_2/IFM_SSUS_S000_US5.csv")
+
+S000_EMG_DS1 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S000_EMG/Noraxon_CSV_2/IFM_SSUS_S000_DS1.csv")
+S000_EMG_DS2 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S000_EMG/Noraxon_CSV_2/IFM_SSUS_S000_DS2.csv")
+S000_EMG_DS3 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S000_EMG/Noraxon_CSV_2/IFM_SSUS_S000_DS3.csv")
+S000_EMG_DS4 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S000_EMG/Noraxon_CSV_2/IFM_SSUS_S000_DS4.csv")
+S000_EMG_DS5 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S000_EMG/Noraxon_CSV_2/IFM_SSUS_S000_DS5.csv")
+
+```
+
+Time to read in all of the EMG data from Subject 2!
+```{r read in data subject 1}
+S001_EMG_Flat1 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S001_EMG/Noraxon_CSV/IFM_SSUS_S001_Flat1.csv")
+S001_EMG_Flat2 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S001_EMG/Noraxon_CSV/IFM_SSUS_S001_Flat2.csv")
+S001_EMG_Flat3 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S001_EMG/Noraxon_CSV/IFM_SSUS_S001_Flat3.csv")
+S001_EMG_Flat4 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S001_EMG/Noraxon_CSV/IFM_SSUS_S001_Flat4.csv")
+
+S001_EMG_US1 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S001_EMG/Noraxon_CSV/IFM_SSUS_S001_US1.csv")
+S001_EMG_US2 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S001_EMG/Noraxon_CSV/IFM_SSUS_S001_US2.csv")
+S001_EMG_US3 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S001_EMG/Noraxon_CSV/IFM_SSUS_S001_US3.csv")
+S001_EMG_US4 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S001_EMG/Noraxon_CSV/IFM_SSUS_S001_US4.csv")
+S001_EMG_US5 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S001_EMG/Noraxon_CSV/IFM_SSUS_S001_US5.csv")
+
+S001_EMG_DS1 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S001_EMG/Noraxon_CSV/IFM_SSUS_S001_DS1.csv")
+S001_EMG_DS2 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S001_EMG/Noraxon_CSV/IFM_SSUS_S001_DS2.csv")
+S001_EMG_DS3 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S001_EMG/Noraxon_CSV/IFM_SSUS_S001_DS3.csv")
+S001_EMG_DS4 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S001_EMG/Noraxon_CSV/IFM_SSUS_S001_DS4.csv")
+S001_EMG_DS5 <- read.csv ("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/S001_EMG/Noraxon_CSV/IFM_SSUS_S001_DS5.csv")
+```
+
+Although not part of this primary hypothesis analyzed for this project, evaluating muscle activity in the different stages of stance phase is a novel kinematic analysis in which I intend to implement at a later date.  The following code displays my approach in tackling this task. There are 5 main stages of stance phase; heel strike, flat foot, mid-stance, heel-off, and toe off.  Additionally, I am interested in the phase right before stance which is why this data is cut into sixths and not fifths.  The raw EMG data was previously processed and cut down on a tertiary application, therefore each EMG file only includes the relevant EMG signal in which is of interest in this study. 
+
+```{r function to divide into equal stance intervals}
+#function to divide rows of EMG data into  equal time intervals representitive of each phase of stance, this standardizes stance phases across subjects
+divide_into_sixths <- function(df) {
+  num_rows <- nrow(df)
+  sixth_size <- num_rows / 6
+  sixths <- list()
+  for ( i in 1:6) {
+    start_row <- (i-1) * sixth_size + 1 
+    end_row <- min (i* sixth_size, num_rows)
+    sixth <- df[start_row:end_row, , drop = FALSE]
+    sixths[[i]] <- sixth}
+  return(sixths)
+}
+
+all_sixth <- divide_into_sixths(S000_EMG_DS5) ##### Use the rest of code for each trial for each subject (enter in the name of each file and then run it through the code)
+
+#Naming each interval to their respective name of stance phase
+heelstrike_emg <- as.data.frame(all_sixth[1])
+flatfoot_emg <-as.data.frame(all_sixth[2])
+midstance_emg <- as.data.frame(all_sixth[3])
+heellift_emg <- as.data.frame(all_sixth[4])
+toeoff_emg <- as.data.frame(all_sixth[5])
+preswing_emg <- as.data.frame(all_sixth[6])
+```
+
+The function above divides the EMG data into 6 equal sub-data sets, representing each stance phase. After reading one file in and entering the name of the file into line 76.  Continue with the code below until you see the annotation "RINSE AND REPEAT".  
+
+```{r heel strike}
+#Heel Strike 
+meanEMG_hs <- colMeans(heelstrike_emg) #calculating mean EMG for stance phase in a given time interval
+meanEMG_hs <- data.frame(meanEMG_hs) #storing means as a data frame
+
+#Making new row
+meanEMG_hs$name <- rownames(meanEMG_hs)
+colnames(meanEMG_hs)[colnames(meanEMG_hs)=="meanEMG_hs"] <- "meanEMGvalues"
+meanEMG_hs <- pivot_wider(meanEMG_hs, names_from = name,  values_from = meanEMGvalues ) # makes each intrinsic foot muscle a column in stead of a row
+meanEMG_hs <- meanEMG_hs [-c(1, 8)] # gets rid of EMG sync data that is not considered for analyses
+
+#renaming columns representitve of each intirnsic foot muscle (ABDH = abductor hallicus, ABDM = abductor digiti minimi, PDIO1 = 1st dorsal introsseus, PDIO3 = 3rd dorsal interosseus, FDB = flexor digitorum brevis, EDB = extensor digitorum brevis)
+colnames(meanEMG_hs)[1] = "ABDH"
+colnames(meanEMG_hs)[2] = "ABDM"
+colnames(meanEMG_hs)[3] = "PDIO1"
+colnames(meanEMG_hs)[4] = "PDIO3"
+colnames(meanEMG_hs)[5] = "FDB"
+colnames(meanEMG_hs)[6] = "EDB"
+
+meanEMG_hs <- pivot_longer(meanEMG_hs, cols = c(ABDH, ABDM, PDIO1, PDIO3, FDB, EDB), names_to = "Muscle", values_to = "Mean_EMG") #creating new column for muscle names and moving the names of each muscle from individual columns to under this name column
+
+percent_stance <- c("0-20") # making new object representing the percentage of stance
+meanEMG_hs$percent_stance <- percent_stance # adding percent stance column to existing data frame
+
+Subject <- c(1) #chnage subject to subject number (1, 2, 3, 4, 55 ...ect)
+Slope <- c("Downslope") #change slope to substrate condition (Flat = flat; US = uslope, DS=downslope)
+Trial <- c(5)  #change trial to respective trial number (1, 2, 3, 4, 5)
+
+# Add new columns to the existing dataframe
+meanEMG_hs$Subject <- Subject
+meanEMG_hs$Slope <- Slope
+meanEMG_hs$Trial <- Trial
+
+MEP_hs <- (meanEMG_hs) #rename data frame
+```
+
+```{r flatfoot}
+#Flat Foot
+meanEMG_ff <- colMeans(flatfoot_emg) #calculating mean EMG for stance phase in a given time interval
+meanEMG_ff <- data.frame(meanEMG_ff) #storing means as a data frame
+
+#Making new row
+meanEMG_ff$name <- rownames(meanEMG_ff)
+colnames(meanEMG_ff)[colnames(meanEMG_ff)=="meanEMG_ff"] <- "meanEMGvalues"
+meanEMG_ff <- pivot_wider(meanEMG_ff, names_from = name,  values_from = meanEMGvalues ) # makes each intrinsic foot muscle a column in stead of a row
+meanEMG_ff <- meanEMG_ff [-c(1, 8)] # gets rid of EMG sync data that is not considered for analyses
+
+#renaming columns representitve of each intirnsic foot muscle (ABDH = abductor hallicus, ABDM = abductor digiti minimi, PDIO1 = 1st dorsal introsseus, PDIO3 = 3rd dorsal interosseus, FDB = flexor digitorum brevis, EDB = extensor digitorum brevis)
+colnames(meanEMG_ff)[1] = "ABDH"
+colnames(meanEMG_ff)[2] = "ABDM"
+colnames(meanEMG_ff)[3] = "PDIO1"
+colnames(meanEMG_ff)[4] = "PDIO3"
+colnames(meanEMG_ff)[5] = "FDB"
+colnames(meanEMG_ff)[6] = "EDB"
+
+meanEMG_ff <- pivot_longer(meanEMG_ff, cols = c(ABDH, ABDM, PDIO1, PDIO3, FDB, EDB), names_to = "Muscle", values_to = "Mean_EMG") #creating new column for muscle names and moving the names of each muscle from individual columns to under this name column
+
+percent_stance <- c("20-40") # making new object representing the percentage of stance
+meanEMG_ff$percent_stance <- percent_stance # adding percent stance column to existing data frame
+
+
+Subject <- c(1) #chnage subject to subject number (1, 2, 3, 4, 55 ...ect)
+Slope <- c("Downslope") #change slope to substrate condition (Flat = flat; US = uslope, DS=downslope)
+Trial <- c(5) # change trial to respective trial number (1, 2, 3, 4, 5)
+
+# Add new columns to the existing dataframe
+meanEMG_ff$Subject <- Subject
+meanEMG_ff$Slope <- Slope
+meanEMG_ff$Trial <- Trial 
+
+MEP_ff <-(meanEMG_ff) #rename dataframe
+```
+
+```{r midstance}
+meanEMG_ms <- colMeans(midstance_emg) #calculating mean EMG for stance phase in a given time interval
+meanEMG_ms <- data.frame(meanEMG_ms) #storing means as a data frame
+
+#Making new row
+meanEMG_ms$name <- rownames(meanEMG_ms)
+colnames(meanEMG_ms)[colnames(meanEMG_ms)=="meanEMG_ms"] <- "meanEMGvalues"
+meanEMG_ms <- pivot_wider(meanEMG_ms, names_from = name,  values_from = meanEMGvalues ) # makes each intrinsic foot muscle a column in stead of a row
+meanEMG_ms <- meanEMG_ms [-c(1, 8)] # gets rid of EMG sync data that is not considered for analyses
+
+#renaming columns Representative of each intirnsic foot muscle (ABDH = abductor hallicus, ABDM = abductor digiti minimi, PDIO1 = 1st dorsal introsseus, PDIO3 = 3rd dorsal interosseus, FDB = flexor digitorum brevis, EDB = extensor digitorum brevis)
+colnames(meanEMG_ms)[1] = "ABDH"
+colnames(meanEMG_ms)[2] = "ABDM"
+colnames(meanEMG_ms)[3] = "PDIO1"
+colnames(meanEMG_ms)[4] = "PDIO3"
+colnames(meanEMG_ms)[5] = "FDB"
+colnames(meanEMG_ms)[6] = "EDB"
+
+meanEMG_ms <- pivot_longer(meanEMG_ms, cols = c(ABDH, ABDM, PDIO1, PDIO3, FDB, EDB), names_to = "Muscle", values_to = "Mean_EMG") #creating new column for muscle names and moving the names of each muscle from individual columns to under this name column
+
+percent_stance <- c("40-60") # making new object representing the percentage of stance
+meanEMG_ms$percent_stance <- percent_stance # adding percent stance column to existing data frame
+
+Subject <- c(1) #chnage subject to subject number (1, 2, 3, 4, 55 ...ect)
+Slope <- c("Downslope") #change slope to substrate condition (Flat = flat; US = uslope, DS=downslope)
+Trial <- c(5) # change trial to respective trial number (1, 2, 3, 4, 5)
+
+# Add new columns to the existing dataframe
+meanEMG_ms$Subject <- Subject
+meanEMG_ms$Slope <- Slope
+meanEMG_ms$Trial <- Trial
+
+MEP_ms <-(meanEMG_ms) #rename data frame
+
+```
+
+```{r heellift}
+meanEMG_hl <- colMeans(heellift_emg) #calculating mean EMG for stance phase in a given time interval
+meanEMG_hl <- data.frame(meanEMG_hl) #storing means as a data frame
+
+#Making new row
+meanEMG_hl$name <- rownames(meanEMG_hl)
+colnames(meanEMG_hl)[colnames(meanEMG_hl)=="meanEMG_hl"] <- "meanEMGvalues"
+meanEMG_hl <- pivot_wider(meanEMG_hl, names_from = name,  values_from = meanEMGvalues ) # makes each intrinsic foot muscle a column in stead of a row
+meanEMG_hl <- meanEMG_hl [-c(1, 8)] # gets rid of EMG sync data that is not considered for analyses
+
+#renaming columns representitve of each intirnsic foot muscle (ABDH = abductor hallicus, ABDM = abductor digiti minimi, PDIO1 = 1st dorsal introsseus, PDIO3 = 3rd dorsal interosseus, FDB = flexor digitorum brevis, EDB = extensor digitorum brevis)
+colnames(meanEMG_hl)[1] = "ABDH"
+colnames(meanEMG_hl)[2] = "ABDM"
+colnames(meanEMG_hl)[3] = "PDIO1"
+colnames(meanEMG_hl)[4] = "PDIO3"
+colnames(meanEMG_hl)[5] = "FDB"
+colnames(meanEMG_hl)[6] = "EDB"
+
+meanEMG_hl <- pivot_longer(meanEMG_hl, cols = c(ABDH, ABDM, PDIO1, PDIO3, FDB, EDB), names_to = "Muscle", values_to = "Mean_EMG") #creating new column for muscle names and moving the names of each muscle from individual columns to under this name column
+
+percent_stance <- c("60-80") # making new object representing the percentage of stance
+meanEMG_hl$percent_stance <- percent_stance # adding percent stance column to existing data frame
+
+Subject <- c(1) # change subject to subject number (1, 2, 3, 4, 5... etc)
+Slope <- c("Downslope") #change slope to substrate condition (Flat = flat; US = uslope, DS=downslope)
+Trial <- c(5) # change trial to respective trial number (1, 2, 3, 4, 5)
+
+# Add new columns to the existing dataframe
+meanEMG_hl$Subject <- Subject 
+meanEMG_hl$Slope <- Slope
+meanEMG_hl$Trial <- Trial
+
+MEP_hl <-(meanEMG_hl) #rename data frame
+```
+
+
+```{r toeoff}
+meanEMG_to <- colMeans(toeoff_emg) #calculating mean EMG for stance phase in a given time interval
+meanEMG_to <- data.frame(meanEMG_to) #storing means as a data frame
+
+#Making new row
+meanEMG_to$name <- rownames(meanEMG_to)
+colnames(meanEMG_to)[colnames(meanEMG_to)=="meanEMG_to"] <- "meanEMGvalues"
+meanEMG_to <- pivot_wider(meanEMG_to, names_from = name,  values_from = meanEMGvalues ) # makes each intrinsic foot muscle a column in stead of a row
+meanEMG_to <- meanEMG_to [-c(1, 8)] # gets rid of EMG sync data that is not considered for analyses
+
+#renaming columns representitve of each intirnsic foot muscle (ABDH = abductor hallicus, ABDM = abductor digiti minimi, PDIO1 = 1st dorsal introsseus, PDIO3 = 3rd dorsal interosseus, FDB = flexor digitorum brevis, EDB = extensor digitorum brevis)
+colnames(meanEMG_to)[1] = "ABDH"
+colnames(meanEMG_to)[2] = "ABDM"
+colnames(meanEMG_to)[3] = "PDIO1"
+colnames(meanEMG_to)[4] = "PDIO3"
+colnames(meanEMG_to)[5] = "FDB"
+colnames(meanEMG_to)[6] = "EDB"
+
+meanEMG_to <- pivot_longer(meanEMG_to, cols = c(ABDH, ABDM, PDIO1, PDIO3, FDB, EDB), names_to = "Muscle", values_to = "Mean_EMG") #creating new column for muscle names and moving the names of each muscle from individual columns to under this name column
+
+percent_stance <- c("80-100") # making new object representing the percentage of stance
+meanEMG_to$percent_stance <- percent_stance # adding percent stance column to existing data frame
+
+Subject <- c(1) #chnage subject to subject number (1, 2, 3, 4, 55 ...ect)
+Slope <- c("Downslope") #change slope to substrate condition (Flat = flat; US = uslope, DS = downslope)
+Trial <- c(5) # change trial to respective trial number (1, 2, 3, 4, 5)
+
+# Add new columns to the existing dataframe
+meanEMG_to$Subject <- Subject
+meanEMG_to$Slope <- Slope
+meanEMG_to$Trial <- Trial
+
+MEP_to <-(meanEMG_to) #rename data frame
+```
+
+Now the file should be subdivided into 5 different data frames.  The next steps will then bind these data frames into one and you will have one final data frame with the mean EMG values for each stance phase for one subject for one trial walking on one substrate.  
+
+
+```{r making final data frame for secific trial}
+#change object name to respective subject, substrate, and trial number (each time you run a file through the code)
+S000_MEP_DS5 <- rbind(MEP_hs, MEP_ff, MEP_ms, MEP_hl, MEP_to) # merge all mean stance phases into one data frame for each trial and each subject
+```
+
+RINSE AND REPEAT FOR ALL FLAT SUBSTRATE FILES
+
+After running all flat substrate trials for one subject through this section of code, we want to bind all 5 data frames into one data frame. Therefore we will have one data frame for all trials performed on on the flat substrate for subject 1.  
+
+Repeat these steps for the other two substrate types (upslope & downslope).  The code following "Final_S000_MEP"  if combining all substrates and all trials for one subject. There are currently "hashtagged" to enable the creation of an html, but remove the hash tags and the code will run!
+
+```{r combing substrates, trials and subjects into one master data frame, error = FALSE}
+#creating a final data frame for each subject
+
+#Subject 1
+#S000_MEP_Flat <- rbind(S000_MEP_f1, S000_MEP_f2,S000_MEP_f3, S000_MEP_f4)
+
+#S000_MEP_Upslope <- rbind(S000_MEP_US1, S000_MEP_US2,S000_MEP_US3, S000_MEP_US4, S000_MEP_US5)
+
+#S000_MEP_Downslope <- rbind(S000_MEP_DS1, S000_MEP_DS2,S000_MEP_DS3, S000_MEP_DS4, S000_MEP_DS5)
+
+#Final_S000_MEP <- rbind(S000_MEP_Flat, S000_MEP_Upslope, S000_MEP_Downslope)
+##########################################################################################################
+
+#Subject 2
+#S001_MEP_Flat <- rbind(S001_MEP_f1, S001_MEP_f2,S001_MEP_f3, S001_MEP_f4, S001_MEP_f5)
+
+#S001_MEP_Upslope <- rbind(S001_MEP_US1, S001_MEP_US2,S001_MEP_US3, S001_MEP_US4, S001_MEP_US5)
+
+#S001_MEP_Downslope <- rbind(S001_MEP_DS1, S001_MEP_DS2,S001_MEP_DS3, S001_MEP_DS4, S001_MEP_DS5)
+
+#Final_S001_MEP <- rbind(S001_MEP_Flat, S001_MEP_Upslope, S001_MEP_Downslope)
+
+############################
+
+```
+After repeating steps for all subjects, trials, and substrate type, we can then use the code below to create final csv. file in which will serve as the master file for further data analysis.
+```{r}
+# combine both each subjects final data frame toegther to get one master data frame
+
+#b12 <- rbind(Final_S000_MEP, Final_S001_MEP)
+
+#write.csv(Final_S001_MEP, "C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/b12.csv", row.names=TRUE)
+```
+
+
+Read in the master data file!
+```{r reading in master data frame}
+b12 <- read.csv("C:/Users/lotsislr/OneDrive - James Madison University/Documents/BIO611/BIO611_Final/BIO611/b12.csv")
+```
+
+Before doing anything, take a gander at the data and see what it looks like! Make sure that there are no missing values!
+```{r What does the data look like?}
+head(b12)
+```
+
+For the purposes of this project, I wanted to determine whether specific intrinsic foot muscles were more active when walking on specific substrates, potentially allowing for substrate specific accommodations in regards to modulating anatomical foot structure. Therefore, this next peice of code take the average muscle activity for each intrinsic foot muscle over the entire stance.
+
+```{r mean EMG activity for the entire step (averageing stance) }
+ABDH <- as.data.frame(subset(b12, Muscle == "ABDH")) # making each muscle its own data frame
+
+#calculating the mean EMG across the entire stance phase
+mean_ABDH <- ABDH %>%
+  group_by(Slope) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mABDH <- ABDH %>% 
+  group_by(Subject, Trial, Slope) %>% 
+  summarize(Mean_EMG = mean(Mean_EMG))
+
+mABDH$Muscle <- "ABDH"     #creating new column named "muscle" for each intrinsic foot muscle
+
+#############################
+ABDM <- as.data.frame(subset(b12, Muscle == "ABDM"))
+
+#calculating the mean EMG across the entire stance phase
+mean_ABDM <- ABDM %>%
+  group_by(Slope) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mABDM <- ABDM %>% 
+  group_by(Subject, Trial, Slope) %>% 
+  summarize(Mean_EMG = mean(Mean_EMG))
+
+mABDM$Muscle <- "ABDM"     #creating new column named "muscle" for each intrinsic foot muscle
+
+##############################
+PDIO1 <- as.data.frame(subset(b12, Muscle == "PDIO1"))
+
+#calculating the mean EMG across the entire stance phase
+mean_PDIO1 <- PDIO1 %>%
+  group_by(Slope) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mPDIO1 <- PDIO1 %>% 
+  group_by(Subject, Trial, Slope) %>% 
+  summarize(Mean_EMG = mean(Mean_EMG))
+
+mPDIO1$Muscle <- "PDIO1"    #creating new column named "muscle" for each intrinsic foot muscle
+
+##############################
+PDIO3 <- as.data.frame(subset(b12, Muscle == "PDIO3"))
+
+#calculating the mean EMG across the entire stance phase
+mean_PDIO3 <- PDIO3 %>%
+  group_by(Slope) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mPDIO3 <- PDIO3 %>% 
+  group_by(Subject, Trial, Slope) %>% 
+  summarize(Mean_EMG = mean(Mean_EMG))
+
+mPDIO3$Muscle <- "PDIO3"     #creating new column named "muscle" for each intrinsic foot muscle
+
+#############################
+FDB <- as.data.frame(subset(b12, Muscle == "FDB"))
+
+#calculating the mean EMG across the entire stance phase
+mean_FDB <- FDB %>%
+  group_by(Slope) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mFDB <- FDB %>% 
+  group_by(Subject, Trial, Slope) %>% 
+  summarize(Mean_EMG = mean(Mean_EMG))
+
+mFDB$Muscle <- "FDB"    #creating new column named "muscle" for each intrinsic foot muscle
+############################
+EDB <- as.data.frame(subset(b12, Muscle == "EDB"))
+
+#calculating the mean EMG across the entire stance phase
+mean_EDB <- EDB %>%
+  group_by(Slope) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mEDB <- EDB %>% 
+  group_by(Subject, Trial, Slope) %>% 
+  summarize(Mean_EMG = mean(Mean_EMG))
+ 
+mEDB$Muscle <- "EDB"     #creating new column named "muscle" for each intrinsic foot muscle
+###########################
+b13 <- rbind(mABDH, mABDM, mPDIO1, mPDIO3, mFDB, mEDB) # combining mean EMG for each muscle into one data frame
+
+b13 <- b13 %>% arrange(Slope) #sorting data frame by substrate type
+```
+
+The new data frame with average EMG values for each muscle was renamed to "b13." Due to the number of effects in the model (discussed later) it is not important to make sure that each variable is represented as the right class.  The response variable, "EMG values" should be the only continuous variable.  All other variables should be classified as "character"
+
+```{r checking type of variables}
+head(b13)
+###Refactoring variables into appropriate type
+b13$Subject <- as.character(b13$Subject)
+b13$Slope <- as.character(b13$Slope)
+b13$Trial <- as.character(b13$Trial)
+b13$Muscle <- as.character(b13$Muscle)
+b13$Mean_EMG <- as.numeric(b13$Mean_EMG)
+```
+Before choosing a model and running statistical analyses, this next peice of code visualizes the shape of the data for the assumption of normality.  Normality was visualized for each substrate type, as well as across all substrates.
+```{r preliminary visualization}
+
+#making data frames specific to substrate type
+FL <- b13[b13$Slope == "Flat", ]
+US <- b13[b13$Slope == "Upslope", ]
+DS <- b13[b13$Slope == "Downslope", ]
+
+#histogram visulization for normality assumption
+hist(b13$Mean_EMG, xlab = "", main = "Electromyrography Values(%) across all substrates")
+hist(FL$Mean_EMG,xlab = "", main = "Electromyrography Values(%) on Flat Substrate" )
+hist(US$Mean_EMG,xlab = "", main = "Electromyrography Values(%) on Uslope Substrate")
+hist(DS$Mean_EMG,xlab = "", main = "Electromyrography Values(%) on Downslope Substrate")
+
+```
+The data looks relatively normal! (Although some possible skewedness to the right...)
+Data Description and analysis logistics:
+1. Continuous response variable, range (0-∞)
+2. Independent observations
+3. Random and fixed effects
+4. Normality (possible right-skewedness)
+
+Given these assumptions and analysis implications a general mixed effect model with either or Gaussian or gamma distribution probability distribution serve as the most appropriate models to use for this data. The next line of code was used to determine which model out of the two was most appropriate. 
+
+Fixed effects: 
+1.Muscle
+2.Slope
+3.Muscle*Slope
+
+Random Effects (for intra/intersubject variance)
+1. Subject, and Trial nested within subject
+
+```{r model analaysis}
+#general mixed effect model with gaussian probability distribution
+glmodelGA<- glmer(Mean_EMG ~ Slope + Muscle + Slope*Muscle + (1 | Subject/Trial), family=gaussian(link="identity"), data = b13)
+
+#general mixed effect model with gamma probability distribution
+glmodelGAM<- glmer(Mean_EMG ~ Slope + Muscle + Slope*Muscle + (1 | Subject/Trial), data = b13, family=Gamma(link="log"))
+
+#analysis of dispersion
+deviance(glmodelGA)/df.residual(glmodelGA)
+deviance(glmodelGAM)/df.residual(glmodelGAM)
+
+#Akaike Information Criterion (AIC)
+AIC(glmodelGA,glmodelGAM)
+
+deviance(glmodelGA)/df.residual(glmodelGA)
+```
+This next section of code was used to analyze the assumption of equal variances.  This further helped determine the most appropriate model.
+```{r residual plots of models}
+#simulating residuas for Gaussian Distribution
+sim_GA <- simulateResiduals(fittedModel = glmodelGA)
+#simulating residuals for Gamma Distribution
+sim_GAM <-simulateResiduals(fittedModel = glmodelGAM)
+#plotting residuals 
+plotGA <- plot(sim_GA)
+plotGAM <- plot(sim_GAM)
+
+residuals <- resid(glmodelGA)
+plot(residuals, main = "GLMER-Gaussian Residuals Plot", xlab = "Observation Index", ylab = "Residuals") + abline(h=0, col = "red")
+
+residuals <- resid(glmodelGAM)
+plot(residuals, main = "GLMER-Gamma Residuals Plot", xlab = "Observation Index", ylab = "Residuals") + abline(h=0, col = "red")
+```
+Gaussian was superior!
+The next section of code was used to obtain the intial outputs of the model.
+
+```{r glmer output}
+#obtaining intitia output on the effects of both fixed and random effects on repsonse variable (EMG_values)
+summary(glmodelGA)
+anova(glmodelGA)
+```
+Bonferroni correction is a commonly used method in similar literature, controlling for family wise error rate and therefore decreasing the likelihood of committing a type 1 Error. 
+
+```{r}
+#Post-hoc pairwise comparrisons using bonferonni correction to control for family wise error rate (reduce the liklihood of committing a type 1 error)
+emmeans <- emmeans(glmodelGA, ~ Slope * Muscle, type = "Mean_EMG")
+bonfer <- pairs(emmeans, adjust = "bonferroni")
+head(bonfer)
+```
+
+Looks like we have some significance! Now, lets visualize the data!
+
+```{r}
+#making data frames for each muscle for histogram visualization
+hABDH <- b13[b13$Muscle == "ABDH", ]
+hABDM <- b13[b13$Muscle == "ABDM", ]
+hPDIO1 <- b13[b13$Muscle == "PDIO1", ]
+hPDIO3 <- b13[b13$Muscle == "PDIO3", ]
+hFDB <- b13[b13$Muscle == "FDB", ]
+hEDB <- b13[b13$Muscle == "EDB", ]
+
+
+########making box plots for each muscle using ggplot()
+
+ggplot(hABDH, aes(x=Slope, y=Mean_EMG, fill = Slope)) + 
+  geom_boxplot(color = "black", fill = c("orange", "lightgreen", "lightblue")) + # adding color for each substrate type
+     geom_jitter(posisition = position_jitter(width = 0.5), alpha = 0.25, size = 0.8) + #adding raw data values
+      labs(title = "ABDH EMG Values Across Substrates", x="Substrate", y = "Mean EMG Values") + # adding main and axis titles
+       theme_classic() + 
+        theme(plot.title = element_text(hjust = 0.5)) + #shifting title to center
+          coord_cartesian(ylim = c(0, 65)) #adjusting y axis limits
+    
+  
+######ABDM
+ggplot(hABDM, aes(x=Slope, y=Mean_EMG, fill = Slope)) + 
+  geom_boxplot(color = "black", fill = c("orange", "lightgreen", "lightblue")) + # adding color for each substrate type
+   geom_jitter(posisition = position_jitter(width = 0.5), color = "black", alpha = 0.25, size = 0.8) + #adding raw data valuesv
+     labs(title = "ABDM EMG Values Across Substrates", x="Substrate", y = "Mean EMG Values") + # adding main and axis titles
+       theme_classic() + theme(plot.title = element_text(hjust = 0.5)) + #shifting title to center
+        coord_cartesian(ylim = c(0, 65)) #adjusting y axis limits
+
+#####PDIO1
+ggplot(hPDIO1, aes(x=Slope, y=Mean_EMG, fill = Slope)) + 
+  geom_boxplot(color = "black", fill = c("orange", "lightgreen", "lightblue")) + # adding color for each substrate type
+   geom_jitter(posisition = position_jitter(width = 0.5), color = "black", alpha = 0.25, size = 0.8) + #adding raw data values
+     labs(title = "PDIO1 EMG Values Across Substrates", x="Substrate", y = "Mean EMG Values") + 
+       theme_classic() + theme(plot.title = element_text(hjust = 0.5)) + #shifting title to center
+        coord_cartesian(ylim = c(0, 65)) #adjusting y axis limits
+
+#####PDIO3
+ggplot(hPDIO3, aes(x=Slope, y=Mean_EMG, fill = Slope)) + 
+  geom_boxplot(color = "black", fill = c("orange", "lightgreen", "lightblue")) + # adding color for each substrate type
+   geom_jitter(posisition = position_jitter(width = 0.5), color = "black", alpha = 0.25, size = 0.8) + #adding raw data values
+     labs(title = "PDIO3 EMG Values Across Substrates", x="Substrate", y = "Mean EMG Values") + 
+        theme_classic() + theme(plot.title = element_text(hjust = 0.5)) + #shifting title to center
+          coord_cartesian(ylim = c(0, 65)) #adjusting y axis limits
+
+ggplot(hFDB, aes(x=Slope, y=Mean_EMG, fill = Slope)) + 
+  geom_boxplot(color = "black", fill = c("orange", "lightgreen", "lightblue")) + # adding color for each substrate type
+   geom_jitter(posisition = position_jitter(width = 0.5), color = "black", alpha = 0.25, size = 0.8) + #adding raw data values
+     labs(title = "FDB EMG Values Across Substrates", x="Substrate", y = "Mean EMG Values") + 
+       theme_classic() + theme(plot.title = element_text(hjust = 0.5)) + #shifting title to center
+        coord_cartesian(ylim = c(0, 65)) #adjusting y axis limits
+ 
+ggplot(hEDB, aes(x=Slope, y=Mean_EMG, fill = Slope)) + 
+  geom_boxplot(color = "black", fill = c("orange", "lightgreen", "lightblue")) + # adding color for each substrate type
+    geom_jitter(posisition = position_jitter(width = 0.5), color = "black", alpha = 0.25, size = 0.8) + #adding raw data values
+     labs(title = "EDB EMG Values Across Substrates", x="Substrate", y = "Mean EMG Values") + 
+       theme_bw() + theme(plot.title = element_text(hjust = 0.5)) + #shifting title to center
+        coord_cartesian(ylim = c(0, 65)) #adjusting y axis limits
+```
+```{r summary histogram}
+b14 <- rbind(hABDH, hABDM, hPDIO1, hPDIO3, hFDB, hEDB) #combining muscle back together
+
+b14 <- b14 %>% arrange(Slope) #arranging data frame by slope
+
+ggplot(b14, aes(x = Muscle, y=Mean_EMG, group_by(Slope), fill = Slope)) +
+  geom_boxplot() +  # Add boxplot
+  labs(title = "Mean EMG each Muscle and Each Substrate", x = "Intrinsic Foot Muscle", y = "Mean EMG Values") +
+  scale_fill_manual(values = c("orange", "lightgreen", "lightblue"), labels = c("Downslope", "Flat", "Upslope")) +  # Add color legend
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  theme_bw()+ theme(plot.title = element_text(hjust = 0.5))
+```
+```{r plotting model predicted values}
+glmodelGAMT<- glmer(Mean_EMG ~ Slope + Muscle + Slope*Muscle + (1 | Subject), family=gaussian(link="identity"), data = b13)
+
+#making a new data frame to enter into predicted value
+new_data3 <- expand.grid (Muscle = unique(b13$Muscle), 
+                          Slope = unique(b13$Slope),
+                         Subject = unique(b13$Subject))
+#creating predicted values using model
+new_data3$response_pred <- predict(glmodelGAMT, newdata=new_data3, type = "response")
+
+ggplot(new_data3, aes(x = Muscle, y = response_pred, fill = Slope)) +
+  geom_boxplot() +  
+  scale_fill_manual(values = c("orange", "lightgreen", "lightblue"), labels = c("Downslope", "Flat", "Upslope")) + 
+  labs(title = "GLMER Model Predicted Values", x = "Muscle", y = "EMG Values") +  # Label axes
+  theme_bw() + theme(plot.title = element_text(hjust = 0.5))
+```
+Although not part of this analysis, I wanted to plot the mean activity of each muscle relative to the percentage of stance to help guide future analysis and identify any preliminary trends.
+
+```{r making data frames for each substrate condition for line plots}
+flat <- b12[b12$Slope == "Flat", ]
+upslope <- b12[b12$Slope == "Upslope", ]
+downslope <- b12[b12$Slope == "Downslope", ]
+```
+
+
+```{r stance line plot for falt substrate}
+#making data frame of all values for the first 0-20 percent of stance for flat substrate
+Heel_Strike <- as.data.frame(subset(flat, percent_stance == "0-20")) 
+
+#calculating the mean EMG for a specific muscle for specific heel strike
+mean_heelstrike <- Heel_Strike %>%
+  group_by(Muscle) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mHeel_Strike <- Heel_Strike %>% 
+  group_by(Muscle) %>%
+  summarize(Mean_EMG = mean(Mean_EMG))
+
+#naming stance phase in column
+mHeel_Strike$percent_stance <- "Heel Strike"    
+
+####################################################################
+#making data frame of all values for the first 20-40 percent of stance for flat substrate
+Flat_foot <- as.data.frame(subset(flat, percent_stance == "20-40")) # 
+
+#calculating the mean EMG across the entire stance phase
+mean_flatfoot <- Flat_foot %>%
+  group_by(Muscle) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mFlat_foot <- Flat_foot %>% 
+  group_by(Muscle) %>%
+  summarize(Mean_EMG = mean(Mean_EMG))
+
+#naming stance phase in column
+mFlat_foot$percent_stance <- "Flat Foot" 
+#####################################################################
+#making data frame of all values for the first 40-60 percent of stance for flat substrate
+Midstance <- as.data.frame(subset(flat, percent_stance == "40-60")) 
+
+#calculating the mean EMG across the entire stance phase
+mean_midstance <- Midstance %>%
+  group_by(Muscle) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mmidstance <- Midstance %>% 
+  group_by(Muscle) %>%
+  summarize(Mean_EMG = mean(Mean_EMG))
+#naming stance phase in column
+mmidstance$percent_stance <- "Midstance" 
+#####################################################################
+#making data frame of all values for the first 60-80 percent of stance for flat substrate
+Heel_Lift <- as.data.frame(subset(flat, percent_stance == "60-80")) 
+
+#calculating the mean EMG across the entire stance phase
+mean_heellift <- Heel_Lift %>%
+  group_by(Muscle) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mHeel_Lift <- Heel_Lift %>% 
+  group_by(Muscle) %>%
+  summarize(Mean_EMG = mean(Mean_EMG))
+#naming stance phase in column
+mHeel_Lift$percent_stance <- "Heel Lift" 
+#####################################################################
+#making data frame of all values for the first 80-100 percent of stance for flat substrate
+Toe_off <- as.data.frame(subset(flat, percent_stance == "80-100")) 
+
+#calculating the mean EMG across the entire stance phase
+mean_toeoff <- Toe_off %>%
+  group_by(Muscle) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mToe_off <- Toe_off %>% 
+  group_by(Muscle) %>%
+  summarize(Mean_EMG = mean(Mean_EMG))
+#naming stance phase in column
+mToe_off$percent_stance <- "Toe Off" 
+
+#binding all mean EMG specific to each stance phase together into one data frame 
+Flat_stance_final <- rbind (mHeel_Strike, mFlat_foot, mmidstance, mHeel_Lift, mToe_off)
+
+#releveling data frame to plot the correct order to stances on the x-axis
+Flat_stance_final$percent_stance <- fct_relevel(Flat_stance_final$percent_stance, 'Heel Strike', 'Flat Foot', 'Midstance', 'Heel Lift', 'Toe Off')
+
+#plotting mean EMG values of each intrinsic foo muscle for each stance phase interval
+ggplot(Flat_stance_final, aes(x = percent_stance, y = Mean_EMG, colour = Muscle, group = Muscle)) + geom_point() + geom_line() + theme_bw() + labs(title = "Stance Specific IFM Activity on Flat Substrate", y="Mean EMG %(MVC)", x= "Stance Phases") +  theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r stance phase line plot for upslope substrate }
+#making data frame of all values for the first 0-20 percent of stance for upslope substrate
+Heel_Strike <- as.data.frame(subset(upslope, percent_stance == "0-20"))
+
+#calculating the mean EMG across the entire stance phase
+mean_heelstrike <- Heel_Strike %>%
+  group_by(Muscle) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mHeel_Strike <- Heel_Strike %>% 
+  group_by(Muscle) %>%
+  summarize(Mean_EMG = mean(Mean_EMG))
+#naming stance phase in column
+mHeel_Strike$percent_stance <- "Heel Strike"     
+
+#################################################################################
+#making data frame of all values for the first 20-40 percent of stance for upslope substrate
+Flat_foot <- as.data.frame(subset(upslope, percent_stance == "20-40")) 
+
+#calculating the mean EMG across the entire stance phase
+mean_flatfoot <- Flat_foot %>%
+  group_by(Muscle) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mFlat_foot <- Flat_foot %>% 
+  group_by(Muscle) %>%
+  summarize(Mean_EMG = mean(Mean_EMG))
+#naming stance phase in column
+mFlat_foot$percent_stance <- "Flat Foot" 
+######################################################################################
+#making data frame of all values for the first 40-60 percent of stance for upslope substrate
+Midstance <- as.data.frame(subset(upslope, percent_stance == "40-60"))
+
+#calculating the mean EMG across the entire stance phase
+mean_midstance <- Midstance %>%
+  group_by(Muscle) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mmidstance <- Midstance %>% 
+  group_by(Muscle) %>%
+  summarize(Mean_EMG = mean(Mean_EMG))
+#naming stance phase in column
+mmidstance$percent_stance <- "Midstance" 
+#######################################################################################
+#making data frame of all values for the first 60-80 percent of stance for upslope substrate
+Heel_Lift <- as.data.frame(subset(upslope, percent_stance == "60-80")) 
+
+#calculating the mean EMG across the entire stance phase
+mean_heellift <- Heel_Lift %>%
+  group_by(Muscle) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mHeel_Lift <- Heel_Lift %>% 
+  group_by(Muscle) %>%
+  summarize(Mean_EMG = mean(Mean_EMG))
+#naming stance phase in column
+mHeel_Lift$percent_stance <- "Heel Lift" 
+#######################################################################################
+#making data frame of all values for the first 80-100 percent of stance for upslope substrate
+Toe_off <- as.data.frame(subset(upslope, percent_stance == "80-100")) 
+
+#calculating the mean EMG across the entire stance phase
+mean_toeoff <- Toe_off %>%
+  group_by(Muscle) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mToe_off <- Toe_off %>% 
+  group_by(Muscle) %>%
+  summarize(Mean_EMG = mean(Mean_EMG))
+#naming stance phase in column
+mToe_off$percent_stance <- "Toe Off" 
+
+#binding all mean EMG specific to each stance phase together into one data frame 
+Upslope_stance_final <- rbind (mHeel_Strike, mFlat_foot, mmidstance, mHeel_Lift, mToe_off)
+
+#releveling data frame to plot the correct order to stances on the x-axis
+Upslope_stance_final$percent_stance <- fct_relevel(Upslope_stance_final$percent_stance, 'Heel Strike', 'Flat Foot', 'Midstance', 'Heel Lift', 'Toe Off')
+
+#plotting mean EMG values of each intrinsic foo muscle for each stance phase interval
+ggplot(Upslope_stance_final, aes(x = percent_stance, y = Mean_EMG, colour = Muscle, group = Muscle)) + geom_point() + geom_line() + theme_bw() + labs(title = "Stance Specific IFM Activity on Upslope Substrate", y="Mean EMG %(MVC)", x= "Stance Phases") +  theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r stance phase line plot for downslope substrate}
+#making data frame of all values for the first 0-20 percent of stance for downslope substrate
+Heel_Strike <- as.data.frame(subset(downslope, percent_stance == "0-20"))
+
+#calculating the mean EMG across the entire stance phase
+mean_heelstrike <- Heel_Strike %>%
+  group_by(Muscle) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mHeel_Strike <- Heel_Strike %>% 
+  group_by(Muscle) %>%
+  summarize(Mean_EMG = mean(Mean_EMG))
+#naming stance phase in column
+mHeel_Strike$percent_stance <- "Heel Strike"     
+
+##############################################################################
+#making data frame of all values for the first 20-40 percent of stance for downslope substrate
+Flat_foot <- as.data.frame(subset(downslope, percent_stance == "20-40")) 
+
+#calculating the mean EMG across the entire stance phase
+mean_flatfoot <- Flat_foot %>%
+  group_by(Muscle) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mFlat_foot <- Flat_foot %>% 
+  group_by(Muscle) %>%
+  summarize(Mean_EMG = mean(Mean_EMG))
+#naming stance phase in column
+mFlat_foot$percent_stance <- "Flat Foot" 
+#######################################################################################
+#making data frame of all values for the first 40-60 percent of stance for downslope substrate
+Midstance <- as.data.frame(subset(downslope, percent_stance == "40-60")) 
+
+#calculating the mean EMG across the entire stance phase
+mean_midstance <- Midstance %>%
+  group_by(Muscle) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mmidstance <- Midstance %>% 
+  group_by(Muscle) %>%
+  summarize(Mean_EMG = mean(Mean_EMG))
+#naming stance phase in column
+mmidstance$percent_stance <- "Midstance" 
+######################################################################################
+#making data frame of all values for the first 60-80 percent of stance for downslope substrate
+Heel_Lift <- as.data.frame(subset(downslope, percent_stance == "60-80")) 
+
+#calculating the mean EMG across the entire stance phase
+mean_heellift <- Heel_Lift %>%
+  group_by(Muscle) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mHeel_Lift <- Heel_Lift %>% 
+  group_by(Muscle) %>%
+  summarize(Mean_EMG = mean(Mean_EMG))
+#naming stance phase in column
+mHeel_Lift$percent_stance <- "Heel Lift" 
+##################################################################################
+#making data frame of all values for the first 80-100 percent of stance for downslope substrate
+Toe_off <- as.data.frame(subset(downslope, percent_stance == "80-100")) # making each muscle its own data frame
+
+#calculating the mean EMG across the entire stance phase
+mean_toeoff <- Toe_off %>%
+  group_by(Muscle) %>%
+  summarise(mean_Mean_EMG = mean(Mean_EMG), 
+            mean_Mean_EMG = mean(Mean_EMG), 
+             mean_Mean_EMG = mean(Mean_EMG))
+
+mToe_off <- Toe_off %>% 
+  group_by(Muscle) %>%
+  summarize(Mean_EMG = mean(Mean_EMG))
+#naming stance phase in column
+mToe_off$percent_stance <- "Toe Off" 
+
+#binding all mean EMG specific to each stance phase together into one data frame 
+downslope_stance_final <- rbind (mHeel_Strike, mFlat_foot, mmidstance, mHeel_Lift, mToe_off)
+
+#releveling data frame to plot the correct order to stances on the x-axis
+downslope_stance_final$percent_stance <- fct_relevel(downslope_stance_final$percent_stance, 'Heel Strike', 'Flat Foot', 'Midstance', 'Heel Lift', 'Toe Off')
+
+#plotting mean EMG values of each intrinsic foo muscle for each stance phase interval
+ggplot(downslope_stance_final, aes(x = percent_stance, y = Mean_EMG, colour = Muscle, group = Muscle)) + geom_point() + geom_line() + theme_bw() +labs(title = "Stance Specific IFM Activity on Downslope Substrate", y="Mean EMG %(MVC)", x= "Stance Phases") +  theme(plot.title = element_text(hjust = 0.5))
+```
+
+Final Reflections:
+1. Rank your visualizations from 1-5 (or more) in the order in which you
+would like them to be evaluated
+
+>1. Figure 8 (box plot of mean EMG values)
+>2. Figure 10 ("Stance Specific IFM acitivty...Upslope".....really proud of these!)
+>3. Figure 11 ("Stance Specific IFM acitivty...Flat".....really proud of these!)
+>4. Figure 12 ("Stance Specific IFM acitivty...Downslope".....really proud of these!)
+>5. Figure 9 "GLMER Model predicted values"
+
+
+2. Which visualizations, if any, were you most pleased with creating and
+why?
+
+>The visualization in which I was most pleased with creating is the line plots dipicting specific intrinsic foot muscle acitivty relative to specific stages of stance phase grouped by both muscle and substrate.  About a month ago i attempted to make these plots however had not yet created the function ti divide the EMG data into equal stance intervals and wound up having to mannully enter time values by the hundreths of a millisecond in order to do the correct groupings.  Realizing that this was not going to be a sustainable practice when I collected all of the data of over 20 subjects, I knew that there had to be a easier way to accomplish what i was trying to do.  After brainstorming with classmates (J.M) we came up with the idea of creating a function that could divide the data set into five equal time intervals reprentive of each stance phase that could be applied to all of my data for each subject.  This cut the pre-procesing time of data by more than half.  However, I did not know if i was going to be able to recreate the plots that I had previously made suing the old processing method.  The creation of these plots is an illustration on how much I have learned on R this semester, requiring the formation of "pipes" gruping by multiple variables, taking the means of specific columns, manipulating the format of the data (long/wide), and combining multiple elements of ggplot such as point and line graphs.  Although I am pleased with the outcome, I do beleive that these plots have the room for slight improvement.
+
+3. Did you have any issues accessing the data for your project? How did
+you resolve these?
+
+>I collected all of the data myself here in the JMU Biomechanics labaoratory.  Although I did not have any issues with finding my data, working with human subjects brings along many scheduling conflicts, quality of data acquisistion concerns, as well as the maintainment of confidentiality.  This is a whole new side of research in which this project has signifcantly helped me both become familair with and develop me skills. The biggest challenged for me so far is data management; for one experiment there are 20 EMG files created, 20 pressure filed created, and 20 3D kinematic files created, and although they are all collected synchronously, processing this daa requires the use of three different computers in the lab.  At times it felt as though there were so many files everywhere, however the one of the very first assignments in this class was practicing good data management skills.  That assignment helped me get a head start on what was to come and although the current system is not perfect, it is better than what it was before!
+
+4. How did your project topic evolve from what you first envisioned, and
+why?
+> A common pit-fall of scientisits is staring out with ridiculous timeline goals and ideas for analyses, however this is what makes us scientisists! When brainstorming on what i wanted to do for this project, I wanted to analyze plantar pressure with msucle acitvity using a time series analysis, however...thing change.  Wrangling the pressure data alongside of the EMG data turned out to be quite the task and I am dissapointed to say that I was not able to complete this in enough time to run this analysis for this project.  With that said, as the semester progressed my thesis hypotheses as well as some of my research questions drastically changed the more I become familiar with the litertaure and the field in general.  I think this project served as an awesome strating point for getting myself into the mindset of what analyses I am going to run in the future. 
+
+5. Did you have issues related to any analyses that you performed, the
+timeline of the project, your computer or other tools necessary, etc?
+How did you resolve or workaround these issues?
+
+>Yes, No, Yes.  In terms of analysis, the biggest difficulty that I faced was determining what analysis I should run (a commonly experienced tragedy).  I solved this by writing all of the variables a white board in the biomechanics lab and first idenitified my repsonse variable.  From there I was able to determine my preidictors.  And then I was faced with what effects I was going to treat as fixed which ones I was going to treat as random.  I then asked myself which predicotrs in which I was expecting to see a difference in my repsonse.  I dentiified them to be the substarte type and the specific intrinsic foot muscle, as well as the interaction between the two.  I then asked myself which effects am I not direclty maniputaing to inact a change in the repsonse variable, I idenitified these random effects to be Subject and trial. In terms of computer tools, this is where I ran into the most difficulty.  For starters, the computer in which all of the EMG data is collected on is known to spontaneously shut off while in the midts of pocessing, which proved to be irritating.  Additionally, the main computer in which I usually code on in the lab decided that it did not like the new verion of R and inhibited me from finishing this project on it.  I simply moved all files to a thumbdrive and then continued to complete this project on my laptop/desk top. 
+
+6. If you had more time, what would you change (e.g., things you might
+add or remove)?
+
+>If I had more time, one of the things that I would like to add is running statistics on EMG vales of speicifc stance phases.  I intentinoally did not run them in this project because I had a reltaively small sample size and did not think that I would have any statisitcal or practical power to make conlcusions on such a speicific analysis.  However, after viewing my line plots I there does appear to be a trend present within the data in regards to specific muscle activatin relative to the substrate that is being walked on.  Another thing that I would have liked to do is do a deeper dive into the options for post-hoc pairwise analyses I could have performed. I chose a Bonferroni correaction primarily due to is populairty within the litertaure however when thinking aobut the number of comparrisons that I aim to make in the future when I incorporate pressure as well as specific stance phases, I do not think bonferroni is the most practical analyses to use. Furthermore, Bonferoni correction is on the more conservative side of post-hoc anlaysis, which could have potentially lead to the loss of significance. One of the other staticial outputs that seems pretty common in the litertaure is a Maximum Likelihood ratio, I honeslty do not know musch about this however I plan to lookin further into this analysis in the future. 
+
+7. Are you happy with the final results of your project?
+> yes I am very happy with the final results of this project.  The story map was a very cool alternative to making a power point.  I do not think I have ever made as many powerpoints in grad school that I have my entire life.  This was a very nice switch up.  One thing I really enjoyed about this class is that in order to make plots of your data, you first have to understand your data.  What are your varables? What class are your variables? What is your research question? What are you expecting to see? The process of finding the answers to these questions significntly helped me when preparing my proposal talk as well as my overall knowledge of my enture thesis.  Specifically this project encouraged me to combine my scientific statsitical knowledge with my "artsy" in order to produce a visually pleasing and effective story map.  One of the most overlooked aspects in science is how your reuslts are presented to an audianc can make or break the impact of your talk/paper.  I think I have produced a professional, accurate, and visually pleasing final product that I am excited to share with others in my repspective field.
+
+8. May I use your project and/or visualizations as an example for later
+classes? If so, would you like me to redact your name?
+
+>Yes you can use this! In regards to name, it is up to you, I am indifferent!
+
+9. What advice would you give to future students taking this course?
+
+>DO NOT, I REPEAT, DO NOT resist the inevitability of having to learn R.  I was very reistant at first, having absolutley no coding background whatsoever.  However, in hindsight it seems as though I had only wasted time learning something that I was going to have to learn anyway.
+
+>A few quick "Laws of R" 
+1. It is OK to yell at R
+2. R is always right, no matter if you think you are right
+3. It is OK to yell at R
+4. Take breaks when your code is not working after several attempts
+5. It is OK to yell at R
+6. ANNOTATE YOUR CODE.  There have been many times in which I have stayed up coding all night only to wake up, look at my code, and ask myself..."What the heck was I doing last night" 
+7. It is OK to yell at R
+8. Use your peers for help!
+9. It is OK to yell at R
+10. Use resources available to you on the internet!
+
+>THANK YOU FOR A GREAT SEMESTER DR. BROWN!
+
+
